@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using ACMESharp.Crypto.JOSE;
 using ACMESharp.Protocol;
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     class ClientHelper
     {

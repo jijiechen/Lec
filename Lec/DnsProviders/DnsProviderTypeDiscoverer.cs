@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace LeDNSCertStore.DnsProviders
+namespace Lec.DnsProviders
 {
     class DnsProviderTypeDiscoverer
     {
-        static readonly Regex ProviderFileNameRegex = new Regex(@"LeDNSCertStore\.DnsProviders\.(?<name>[^.]+)\.dll$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        static readonly Regex ProviderFileNameRegex = new Regex(@"Lec\.DnsProviders\.(?<name>[^.]+)\.dll$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         internal static Dictionary<string, Type> Discover()
         {

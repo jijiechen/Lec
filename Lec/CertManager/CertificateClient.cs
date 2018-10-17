@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using ACMESharp.Protocol;
 using PKISharp.SimplePKI;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     class CertificateClient
     {

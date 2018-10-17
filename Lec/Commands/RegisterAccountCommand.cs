@@ -3,11 +3,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using ACMESharp.Crypto.JOSE.Impl;
-using LeDNSCertStore.CertManager;
-using static LeDNSCertStore.ConsoleUtils;
-using static LeDNSCertStore.PathUtils;
+using Lec.CertManager;
+using static Lec.ConsoleUtils;
+using static Lec.PathUtils;
 
-namespace LeDNSCertStore.Commands
+namespace Lec.Commands
 {
     class RegisterAccountCommand
     {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     class CertificateExporter
     {

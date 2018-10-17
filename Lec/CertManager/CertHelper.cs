@@ -22,7 +22,7 @@ using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Utilities;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     /// <summary>
     /// Wrapper class around a native BouncyCastle Asymmetric Key Pair.

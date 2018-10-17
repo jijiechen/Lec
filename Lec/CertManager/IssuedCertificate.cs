@@ -1,7 +1,7 @@
 using System.IO;
 using PKISharp.SimplePKI;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
    
     

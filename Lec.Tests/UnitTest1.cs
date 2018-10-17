@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace LeDNSCertStore.Tests
+namespace Lec.Tests
 {
     public class UnitTest1
     {

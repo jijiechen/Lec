@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using ACMESharp.Protocol;
-using LeDNSCertStore.Miscellaneous;
+using Lec.Miscellaneous;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     class AccountHelper
     {

@@ -1,7 +1,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace LeDNSCertStore.Miscellaneous
+namespace Lec.Miscellaneous
 {
     internal class FileUtils
     {

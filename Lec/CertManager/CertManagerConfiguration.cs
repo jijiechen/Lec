@@ -1,4 +1,4 @@
-﻿namespace LeDNSCertStore.CertManager
+﻿namespace Lec.CertManager
 {
     public class CertManagerConfiguration
     {

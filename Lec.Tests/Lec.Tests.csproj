@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LeDNSCertStore\LeDNSCertStore.csproj" />
+    <ProjectReference Include="..\Lec\Lec.csproj" />
   </ItemGroup>
 
 </Project>

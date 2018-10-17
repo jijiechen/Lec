@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LeDNSCertStore
+namespace Lec
 {
     public class KVConfigurationParser
     {

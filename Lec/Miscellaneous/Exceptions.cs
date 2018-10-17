@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ACMESharp.Protocol.Resources;
 
-namespace LeDNSCertStore
+namespace Lec
 {
     class AuthorizationFailedException: Exception
     {

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using ACMESharp.Authorizations;
 using ACMESharp.Protocol;
 using ACMESharp.Protocol.Resources;
-using LeDNSCertStore.DnsProviders;
+using Lec.DnsProviders;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     class DnsAuthorizer
     {

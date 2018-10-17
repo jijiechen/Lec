@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LeDNSCertStore
+namespace Lec
 {
     public class DnsProviderInitializationException: Exception
     {

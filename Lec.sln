@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeDNSCertStore", "LeDNSCertStore\LeDNSCertStore.csproj", "{A184A690-FE54-4E58-883D-7EA59A35658B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lec", "Lec\Lec.csproj", "{A184A690-FE54-4E58-883D-7EA59A35658B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeDNSCertStore.Tests", "LeDNSCertStore.Tests\LeDNSCertStore.Tests.csproj", "{2C8513F9-F771-4E96-A28A-DC566B887F5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lec.Tests", "Lec.Tests\Lec.Tests.csproj", "{2C8513F9-F771-4E96-A28A-DC566B887F5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

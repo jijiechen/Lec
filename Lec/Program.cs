@@ -2,11 +2,11 @@
 using System.Net;
 using System.Reflection;
 using ACMESharp.Protocol;
-using LeDNSCertStore.CertManager;
-using LeDNSCertStore.Commands;
+using Lec.CertManager;
+using Lec.Commands;
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace LeDNSCertStore
+namespace Lec
 {
     class Program
     {

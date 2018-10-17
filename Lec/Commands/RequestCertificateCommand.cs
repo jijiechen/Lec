@@ -1,5 +1,5 @@
-﻿using LeDNSCertStore.CertManager;
-using LeDNSCertStore.DnsProviders;
+﻿using Lec.CertManager;
+using Lec.DnsProviders;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
@@ -7,10 +7,10 @@ using System.IO;
 using System.Threading.Tasks;
 using ACMESharp.Crypto.JOSE;
 using ACMESharp.Protocol;
-using static LeDNSCertStore.ConsoleUtils;
-using static LeDNSCertStore.PathUtils;
+using static Lec.ConsoleUtils;
+using static Lec.PathUtils;
 
-namespace LeDNSCertStore.Commands
+namespace Lec.Commands
 {
     class RequestCertificateCommand
     {

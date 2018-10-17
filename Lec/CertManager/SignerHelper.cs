@@ -3,7 +3,7 @@ using System.IO;
 using ACMESharp.Crypto.JOSE;
 using ACMESharp.Crypto.JOSE.Impl;
 
-namespace LeDNSCertStore.CertManager
+namespace Lec.CertManager
 {
     class SignerHelper
     {
