@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using ACMESharp.Protocol;
@@ -73,10 +74,32 @@ namespace Lec
 
             if (!exceptionPrinted)
             {
+                PrintException(exception);
+            }
+            Environment.Exit(1);
+        }
+
+        private static void PrintException(Exception exception, int? index = null)
+        {
+            if (exception is AggregateException aggregateException)
+            {
+                ConsoleUtils.ConsoleErrorOutput(aggregateException.Message);
+                var innerExceptions = aggregateException.InnerExceptions; // Flatten()?
+                innerExceptions
+                    .Select((ex, i) => new {Exception = ex, Index = i})
+                    .ToList()
+                    .ForEach(item => { PrintException(item.Exception, item.Index); });
+            }
+            else
+            {
+                if (index != null)
+                {
+                    ConsoleUtils.ConsoleErrorOutput($"{Environment.NewLine}====== Inner exception #{index.Value} ======={Environment.NewLine}");    
+                }
+                
                 ConsoleUtils.ConsoleErrorOutput(exception.Message);
                 ConsoleUtils.ConsoleErrorOutput(exception.StackTrace);
             }
-            Environment.Exit(1);
         }
     }
 }

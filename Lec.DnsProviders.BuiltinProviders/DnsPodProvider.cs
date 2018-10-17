@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
-namespace LetsEncryptCentral.DnsProviders.BuiltinProviders
+namespace Lec.DnsProviders.BuiltinProviders
 {
     /// <summary>
     /// The implemetation of using the DnsPod DNS service

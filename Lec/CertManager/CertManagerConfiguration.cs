@@ -3,10 +3,10 @@
     public class CertManagerConfiguration
     {
 #if DEBUG
-        public string AcmeServerBaseUri { get; set; } = "https://acme-staging.api.letsencrypt.org/";
+        public string AcmeServerBaseUri { get; set; } = "https://acme-staging-v02.api.letsencrypt.org/";
 
 #else
-        public string AcmeServerBaseUri { get; set; } =  "https://acme-v01.api.letsencrypt.org/";
+        public string AcmeServerBaseUri { get; set; } =  "https://acme-v02.api.letsencrypt.org/";
 #endif
 
         public string ProxyUri { get; set; }
