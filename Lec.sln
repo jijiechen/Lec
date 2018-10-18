@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lec.DnsProviders.BuiltinPro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lec.Acme", "Lec.Acme\Lec.Acme.csproj", "{1969B4FC-A6B2-4DCE-8F23-978D9613BE6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lec.Web", "Lec.Web\Lec.Web.csproj", "{771DDBF8-AD60-4F4C-98C8-139E055E8035}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,17 @@ Global
 		{1969B4FC-A6B2-4DCE-8F23-978D9613BE6C}.Release|x64.Build.0 = Release|Any CPU
 		{1969B4FC-A6B2-4DCE-8F23-978D9613BE6C}.Release|x86.ActiveCfg = Release|Any CPU
 		{1969B4FC-A6B2-4DCE-8F23-978D9613BE6C}.Release|x86.Build.0 = Release|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Debug|x64.Build.0 = Debug|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Debug|x86.Build.0 = Debug|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Release|Any CPU.Build.0 = Release|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Release|x64.ActiveCfg = Release|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Release|x64.Build.0 = Release|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Release|x86.ActiveCfg = Release|Any CPU
+		{771DDBF8-AD60-4F4C-98C8-139E055E8035}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
