@@ -39,6 +39,8 @@ namespace Lec.Acme.Utilities
                 CertHelper.ExportCertificate(cert, EncodingFormat.PEM, outputStream);
                 CertHelper.ExportPrivateKey(key, EncodingFormat.PEM, outputStream);
             }
+            
+            // todo: Copy received certificate directly as public key
         }
               
         static CertPrivateKey ToKey(byte[] privateKey)

@@ -1,4 +1,6 @@
-﻿//using System;
+﻿// todo: Support Azure DNS
+
+//using System;
 //using System.Collections.Generic;
 //using Microsoft.Azure.Management.Dns;
 //using Microsoft.Azure.Management.Dns.Models;

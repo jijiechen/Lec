@@ -61,6 +61,8 @@ namespace Lec.Acme.Services.Impl
                     throw new InvalidOperationException("Unexpected status for answered Challenge: " + latest.Status);
                 }
             }
+            
+            // todo: Extract a common auto retry
         }
 
         private static async Task ApplyDnsRecordAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)
@@ -77,6 +79,9 @@ namespace Lec.Acme.Services.Impl
                     break;
                 }
             }
+            
+            // todo: 1. Remove record after auth
+            // todo: 2. Break the above while(true) to prevent infinite loops
         }
 
         static async Task<string> AddRecordToDnsAsync(IDnsProvider dnsProvider, Dns01ChallengeValidationDetails dnsChallenge)
