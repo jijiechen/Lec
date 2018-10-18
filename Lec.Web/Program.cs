@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Lec.Web.WebMiddleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lec.Web
 {
@@ -9,7 +10,20 @@ namespace Lec.Web
         static void Main()
         {
             new WebHostBuilder()
-                .Configure(app => app.Run(async context => { await context.Response.WriteAsync("Lec is started!"); }))
+                .ConfigureServices(services =>
+                {
+                    services.AddScoped<ErrorHandlingMiddleware>();
+                    services.AddScoped<StaticFileMiddleware>();
+                    services.AddScoped<DomainManagementMiddleware>();
+                    services.AddScoped<CertificateMiddleware>();
+                })
+                .Configure(app =>
+                {
+                    app.UseMiddleware<ErrorHandlingMiddleware>();
+                    app.UseMiddleware<StaticFileMiddleware>();
+                    app.UseMiddleware<DomainManagementMiddleware>();
+                    app.UseMiddleware<CertificateMiddleware>();
+                })
                 .UseKestrel()
                 .Build()
                 .Run();
