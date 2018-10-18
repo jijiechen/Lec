@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ACMESharpCore" Version="2.0.0.49-beta1" />
-    <PackageReference Include="DnsClient" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="PKISharp.SimplePKI" Version="1.0.0.49-beta1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lec.Acme\Lec.Acme.csproj" />
   </ItemGroup>
 
 </Project>

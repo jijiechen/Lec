@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using ACMESharp.Protocol.Resources;
 
-namespace Lec
+namespace Lec.Acme
 {
-    class AuthorizationFailedException: Exception
+    public class AuthorizationFailedException: Exception
     {
         public IList<Authorization> AuthorizationResults { get; }
 
@@ -16,7 +16,7 @@ namespace Lec
     }
 
 
-    class CertificateApplicationException: Exception
+    public class CertificateApplicationException: Exception
     {
         public string ErrorReason { get; }
 

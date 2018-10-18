@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Lec.DnsProviders
+namespace Lec.Acme.DnsProviders
 {
     public interface IDnsProvider: IDisposable
     {

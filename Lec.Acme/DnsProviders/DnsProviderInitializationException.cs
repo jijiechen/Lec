@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lec
+namespace Lec.Acme.DnsProviders
 {
     public class DnsProviderInitializationException: Exception
     {

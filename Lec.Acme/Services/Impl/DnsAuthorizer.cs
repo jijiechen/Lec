@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ACMESharp.Authorizations;
 using ACMESharp.Protocol;
 using ACMESharp.Protocol.Resources;
-using Lec.DnsProviders;
-using Lec.Miscellaneous;
+using Lec.Acme.DnsProviders;
+using Lec.Acme.Utilities;
 
-namespace Lec.CertManager
+namespace Lec.Acme.Services.Impl
 {
-    class DnsAuthorizer
+    class DnsAuthorizer: IDnsAuthorizer
     {
-        public static async Task Authorize(AcmeProtocolClient client, OrderDetails order, IDnsProvider dnsProvider)
+        public async Task AuthorizeAsync(AcmeProtocolClient client, OrderDetails order, IDnsProvider dnsProvider)
         {
             var getAuthorizations = order.Payload.Authorizations.Select(x => client.GetAuthorizationDetailsAsync(x));
             var allAuthorizations = await Task.WhenAll(getAuthorizations);
@@ -86,5 +85,6 @@ namespace Lec.CertManager
                 dnsProvider.AddTxtRecord(dnsChallenge.DnsRecordName, 
                                         dnsChallenge.DnsRecordValue));
         }
+
     }
 }

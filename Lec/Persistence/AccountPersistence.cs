@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using ACMESharp.Protocol;
-using Lec.Miscellaneous;
 
-namespace Lec.CertManager
+namespace Lec
 {
-    class AccountHelper
+    class AccountPersistence
     {
         public static async Task<AccountDetails> CreateNew(AcmeProtocolClient client, string contactEmail)
         {

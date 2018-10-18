@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DnsClient;
 using DnsClient.Protocol;
 
-namespace Lec.Miscellaneous
+namespace Lec.Acme.Utilities
 {
     public static class DnsUtil
     {

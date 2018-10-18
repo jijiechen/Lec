@@ -4,25 +4,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using SysHashAlgorName = System.Security.Cryptography.HashAlgorithmName;
+using System.Linq;
 using System.Text;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.X509;
-using BcCertificate = Org.BouncyCastle.X509.X509Certificate;
-using Org.BouncyCastle.Asn1;
-using System.Linq;
-using Org.BouncyCastle.Asn1.Pkcs;
-using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.X509;
+using SysHashAlgorName = System.Security.Cryptography.HashAlgorithmName;
+using BcCertificate = Org.BouncyCastle.X509.X509Certificate;
 
-namespace Lec.CertManager
+namespace Lec.Acme.Utilities
 {
     /// <summary>
     /// Wrapper class around a native BouncyCastle Asymmetric Key Pair.

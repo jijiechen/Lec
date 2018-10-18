@@ -1,29 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ACMESharp.Protocol;
-using PKISharp.SimplePKI;
+using Lec.Acme.Models;
 
-namespace Lec.CertManager
+namespace Lec.Acme.Services.Impl
 {
-    class CertificateClient
+    class CertificateCollector: ICertificateCollector
     {
-        public static async Task<IssuedCertificate> RequestCertificate(AcmeProtocolClient client, OrderDetails order, string hostName, List<string> alternativeNames = null)
+        public async Task<IssuedCertificate> CollectCertificateAsync(AcmeProtocolClient client, OrderDetails order, CertificateRequest csr)
         {
-            if (alternativeNames == null)
-            {
-                alternativeNames = new List<string>();
-            }
-
-            var csr = GenerateCSR(hostName, alternativeNames, out PkiKey privateKey);
-            var updatedOrder = await client.FinalizeOrderAsync(order.Payload.Finalize, csr);
-            
-
-            return await TryRequestCertificate(privateKey, client, updatedOrder.OrderUrl);
+            var updatedOrder = await client.FinalizeOrderAsync(order.Payload.Finalize, csr.DerCsr);
+            return await TryRequestCertificate(csr, client, updatedOrder.OrderUrl);
         }
 
-        private static async Task<IssuedCertificate> TryRequestCertificate(PkiKey privateKey, AcmeProtocolClient client, string orderUrl)
+        private static async Task<IssuedCertificate> TryRequestCertificate(CertificateRequest csr, AcmeProtocolClient client, string orderUrl)
         {
             int maxTry = 20;
             int trySleep = 3 * 1000;
@@ -71,22 +62,11 @@ namespace Lec.CertManager
             var certBytes = await client.GetOrderCertificateAsync(updatedOrder);
             return new IssuedCertificate
             {
-                PrivateKey = privateKey.Export(PkiEncodingFormat.Pem),
-                PublicKey = certBytes
+                PemPrivateKey = csr.PemPrivateKey,
+                PemPublicKey = certBytes
             };
         }
 
-        static byte[] GenerateCSR(string hostName, List<string> alternativeNames, out PkiKey privateKey)
-        { 
-            var keys = PkiKeyPair.GenerateRsaKeyPair(Program.GlobalConfiguration.RSAKeyBits);
-            privateKey = keys.PrivateKey;
-            
-            var csr = new PkiCertificateSigningRequest($"cn={hostName}", keys, PkiHashAlgorithm.Sha256);
-            if (alternativeNames.Count > 0)
-            {
-                csr.CertificateExtensions.Add(PkiCertificateExtension.CreateDnsSubjectAlternativeNames(alternativeNames));
-            }
-            return csr.ExportSigningRequest(PkiEncodingFormat.Der);
-        }
+        
     }
 }

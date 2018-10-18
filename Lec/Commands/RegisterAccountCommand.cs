@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using ACMESharp.Crypto.JOSE.Impl;
+using Lec.Acme.Services;
 using Lec.CertManager;
 using static Lec.ConsoleUtils;
 using static Lec.PathUtils;
@@ -11,6 +12,12 @@ namespace Lec.Commands
 {
     class RegisterAccountCommand
     {
+        private readonly ILecManager _lecManager;
+        public RegisterAccountCommand(ILecManager lecManager)
+        {
+            _lecManager = lecManager;
+        }
+        
         public void Setup(CommandLineApplication command)
         {
             command.Description = "Create a new Let's Encrypt registration.";
@@ -45,17 +52,16 @@ namespace Lec.Commands
             Console.Write("Initializing...");
 
 
-            var client = await ClientHelper.CreateAcmeClient();
+            await _lecManager.InitializeAsync(null /* no account */);
             Console.WriteLine("Done.");
             Console.WriteLine("Requesting new registration for {0}...", options.ContactEmailAddress);
             
             
             var contacts = new[] { "mailto:" + options.ContactEmailAddress };
-            var account = await client.CreateAccountAsync(contacts, true);
+            var account = await _lecManager.CreateAccountAsync(contacts, true);
             
-            var signer = client.Signer;
-            AccountHelper.SaveToFile(account, options.OutputPathRegisteration);
-            SignerHelper.SaveToFile((ESJwsTool)signer, options.OutputPathSigner);
+            AccountPersistence.SaveToFile(account.Account, options.OutputPathRegisteration);
+            SignerHelper.SaveToFile((ESJwsTool)account.Signer, options.OutputPathSigner);
 
             Console.WriteLine("Registration created for {0}.", options.ContactEmailAddress);
             Console.WriteLine("Registration profile saved at {0}.", options.OutputPathRegisteration);

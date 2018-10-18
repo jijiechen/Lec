@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using ACMESharp.Protocol;
-using Lec.CertManager;
-using Lec.Commands;
-using Microsoft.Extensions.CommandLineUtils;
 
 namespace Lec
 {
     class Program
     {
-        public const string ApplicationName = "lec";
-        public static CertManagerConfiguration GlobalConfiguration = new CertManagerConfiguration();
+        internal const string ApplicationName = "lec";
 
         static void Main(string[] args)
         {
@@ -23,26 +18,7 @@ namespace Lec
             System.Diagnostics.Debugger.Launch();
 #endif
 
-            var app = new CommandLineApplication
-            {
-                Name = ApplicationName,
-                FullName = "A central Let's Encrypt client that applies certificates using the DNS-01 challenge"
-            };
-
-            app.HelpOption("-?|-h|--help");
-            app.VersionOption("--version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
-
-            // Show help information if no subcommand/option was specified
-            app.OnExecute(() =>
-            {
-                app.ShowHelp();
-                return 9;
-            });
-
-            app.Command("reg", new RegisterAccountCommand().Setup);
-            app.Command("apply", new RequestCertificateCommand().Setup);
-
-            app.Execute(args);
+            Startup.RunApp(ApplicationName, args);
         }
         
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

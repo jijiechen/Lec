@@ -1,12 +1,16 @@
 ﻿using Lec.CertManager;
-using Lec.DnsProviders;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ACMESharp.Crypto.JOSE;
 using ACMESharp.Protocol;
+using Lec.Acme.DnsProviders;
+using Lec.Acme.Models;
+using Lec.Acme.Services;
+using Lec.Acme.Utilities;
 using static Lec.ConsoleUtils;
 using static Lec.PathUtils;
 
@@ -14,7 +18,13 @@ namespace Lec.Commands
 {
     class RequestCertificateCommand
     {
-        static Dictionary<string, Type> AllSupportedDnsProviderTypes = null;
+        private readonly ILecManager _lecManager;
+        public RequestCertificateCommand(ILecManager lecManager)
+        {
+            _lecManager = lecManager;
+        }
+        
+        static Dictionary<string, Type> _allSupportedDnsProviderTypes = null;
 
         public void Setup(CommandLineApplication command)
         {
@@ -53,9 +63,9 @@ namespace Lec.Commands
                     opt.OutputType = outType;
                 }
 
-                if (AllSupportedDnsProviderTypes == null)
+                if (_allSupportedDnsProviderTypes == null)
                 {
-                    AllSupportedDnsProviderTypes = DnsProviderTypeDiscoverer.Discover();
+                    _allSupportedDnsProviderTypes = DnsProviderTypeDiscoverer.Discover();
                 }
                 return Execute(opt);
             });
@@ -75,20 +85,19 @@ namespace Lec.Commands
                 return 210;
             }
 
+            
             Console.Write("Initializing...");
-            var client = await ClientHelper.CreateAcmeClient(requestContext.Account, requestContext.Signer);
+            await _lecManager.InitializeAsync(new AcmeAccount
+            {
+                Account = requestContext.Account,
+                Signer = requestContext.Signer
+            });
             Console.WriteLine("Done.");
 
             try
             {
-                Console.Write("Authorizing domain name {0}...", options.CommonName);
-                var order = await client.CreateOrderAsync(new []{options.CommonName});
-                await DnsAuthorizer.Authorize(client, order, requestContext.DnsProvider);
-                Console.WriteLine("Done.");
-                
-                
                 Console.Write("Requesting a new certificate for common name {0}...", options.CommonName);
-                var cert = await CertificateClient.RequestCertificate(client, order, options.CommonName);
+                var issuedCertificate = await _lecManager.RequestCertificateAsync(requestContext.DnsProvider, options.CommonName, Enumerable.Empty<string>() /* no other hostnames */);
                 Console.WriteLine("Done.");
                 
                 Console.WriteLine("Exporting certificate to file...");
@@ -99,14 +108,16 @@ namespace Lec.Commands
                 }
 
                 options.OutputFile = PrepareOutputFilePath(options.OutputFile, out _);
-                CertificateExporter.Export(cert, options.OutputType, options.OutputFile);
+                using (var file = File.Create(options.OutputFile))
+                {
+                    CertExporter.Export(issuedCertificate, options.OutputType, file);
+                }
                 Console.WriteLine("Certificate has been exported as {0} format at {1}.", outTypeString, options.OutputFile); 
             }
             finally
             {
-                client.Dispose();
                 requestContext.Signer.Dispose();
-                requestContext.DnsProvider.Dispose();                
+                requestContext.DnsProvider.Dispose();
             }
 
             return 0;
@@ -118,7 +129,7 @@ namespace Lec.Commands
 
             try
             {
-                context.Account = AccountHelper.LoadFromFile(options.RegisterationFile);
+                context.Account = AccountPersistence.LoadFromFile(options.RegisterationFile);
             }catch(Exception ex)
             {
                 ConsoleErrorOutput($"Could not load registration file: {ex.Message}");
@@ -138,10 +149,9 @@ namespace Lec.Commands
 
             try
             {
-                var dnsProviderType = AllSupportedDnsProviderTypes[options.DnsProviderName];
+                var dnsProviderType = _allSupportedDnsProviderTypes[options.DnsProviderName];
                 context.DnsProvider = Activator.CreateInstance(dnsProviderType) as IDnsProvider;
-
-                context.DnsProvider.Initialize(options.DnsProviderConfiguration ?? string.Empty);
+                context.DnsProvider?.Initialize(options.DnsProviderConfiguration ?? string.Empty);
             }
             catch(Exception ex)
             {
@@ -178,9 +188,9 @@ namespace Lec.Commands
                 return true;
             }
 
-            if (!AllSupportedDnsProviderTypes.ContainsKey(options.DnsProviderName))
+            if (!_allSupportedDnsProviderTypes.ContainsKey(options.DnsProviderName))
             {
-                var allKeys = string.Join(",", AllSupportedDnsProviderTypes.Keys);
+                var allKeys = string.Join(",", _allSupportedDnsProviderTypes.Keys);
                 ConsoleErrorOutput($"Unknown DNS provider '{options.DnsProviderName}'. The supported providers are: {allKeys}");
                 exitCode = 24;
                 return true;

@@ -1,7 +1,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Lec.Miscellaneous
+namespace Lec
 {
     internal class FileUtils
     {
