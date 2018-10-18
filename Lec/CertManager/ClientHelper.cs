@@ -14,7 +14,7 @@ namespace Lec.CertManager
             var http = CreateHttpClient();
             var client = new AcmeProtocolClient(http, null, account, signer);
             
-            await client.GetDirectoryAsync();
+            client.Directory = await client.GetDirectoryAsync();
             await client.GetNonceAsync();
             
             return client;

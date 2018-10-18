@@ -2,6 +2,7 @@
 using System.IO;
 using ACMESharp.Crypto.JOSE;
 using ACMESharp.Crypto.JOSE.Impl;
+using Newtonsoft.Json;
 
 namespace Lec.CertManager
 {
@@ -9,25 +10,27 @@ namespace Lec.CertManager
     {
         public static IJwsTool LoadFromFile(string signerPath)
         {
-            var xml = File.ReadAllText(signerPath);
-            return GenerateTool("RS256", xml);
+            signerPath = PathUtils.NormalizedPath(signerPath);
+            var json = File.ReadAllText(signerPath);
+            var signerObj = JsonConvert.DeserializeObject<ExportedSigner>(json);
+            return GenerateTool($"ES{signerObj.HashSize}", json);
         }
 
 
-        public static void SaveToFile(RSJwsTool signer, string signerPath)
+        public static void SaveToFile(ESJwsTool signer, string signerPath)
         {
-            var xml = signer.Export();
-            File.WriteAllText(signerPath, xml);
+            var json = signer.Export();
+            File.WriteAllText(signerPath, json);
         }
         
-        private static IJwsTool GenerateTool(string keyType, string path)
+        private static IJwsTool GenerateTool(string keyType, string json)
         {
             if (keyType.StartsWith("ES"))
             {
                 var tool = new ACMESharp.Crypto.JOSE.Impl.ESJwsTool();
                 tool.HashSize = int.Parse(keyType.Substring(2));
                 tool.Init();
-                tool.Import(path);
+                tool.Import(json);
                 return tool;
             }
 
@@ -36,11 +39,17 @@ namespace Lec.CertManager
                 var tool = new ACMESharp.Crypto.JOSE.Impl.RSJwsTool();
                 tool.KeySize = int.Parse(keyType.Substring(2));
                 tool.Init();
-                tool.Import(path);
+                tool.Import(json);
                 return tool;
             }
 
             throw new Exception($"Unknown or unsupported KeyType [{keyType}]");
+        }
+
+
+        class ExportedSigner
+        {
+            public int HashSize { get; set; }
         }
     }
 }

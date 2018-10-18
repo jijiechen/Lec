@@ -7,6 +7,7 @@ using ACMESharp.Authorizations;
 using ACMESharp.Protocol;
 using ACMESharp.Protocol.Resources;
 using Lec.DnsProviders;
+using Lec.Miscellaneous;
 
 namespace Lec.CertManager
 {
@@ -38,7 +39,7 @@ namespace Lec.CertManager
         static async Task AcceptDnsChallengeAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)
         {
             await ApplyDnsRecordAsync(challenge, auth, client, dnsProvider);
-
+            await client.AnswerChallengeAsync(challenge.Url);
 
             var maxTry = 30;
             var trySleep = 3 * 1000;
@@ -50,15 +51,15 @@ namespace Lec.CertManager
                     Thread.Sleep(trySleep);
                 }
                
-                var latestStage = await client.GetChallengeDetailsAsync(challenge.Url);
-                if ("valid" == latestStage.Status)
+                var latest = await client.GetChallengeDetailsAsync(challenge.Url);
+                if ("valid" == latest.Status)
                 {
                     break;
                 }
 
-                if ("pending" != latestStage.Status)
+                if ("pending" != latest.Status)
                 {
-                    throw new InvalidOperationException("Unexpected status for answered Challenge: " + latestStage.Status);
+                    throw new InvalidOperationException("Unexpected status for answered Challenge: " + latest.Status);
                 }
             }
         }
@@ -67,16 +68,23 @@ namespace Lec.CertManager
         {
             var dnsChallenge = AuthorizationDecoder.ResolveChallengeForDns01(auth, challenge, client.Signer);
             var txtRecord = await AddRecordToDnsAsync(dnsProvider, dnsChallenge);
-            await Task.Delay(TimeSpan.FromSeconds(5));
+
+            while (true)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                var record = await DnsUtil.LookupRecordAsync("TXT", dnsChallenge.DnsRecordName);
+                if (record != null)
+                {
+                    break;
+                }
+            }
         }
 
         static async Task<string> AddRecordToDnsAsync(IDnsProvider dnsProvider, Dns01ChallengeValidationDetails dnsChallenge)
         {
-           
-            var dnsName = dnsChallenge.DnsRecordName;
-            var dnsValue = Regex.Replace(dnsChallenge.DnsRecordValue, "\\s", "");
-            
-            return await Task.Factory.StartNew(() => dnsProvider.AddTxtRecord(dnsName, dnsValue));
+            return await Task.Factory.StartNew(() => 
+                dnsProvider.AddTxtRecord(dnsChallenge.DnsRecordName, 
+                                        dnsChallenge.DnsRecordValue));
         }
     }
 }

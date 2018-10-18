@@ -55,7 +55,7 @@ namespace Lec.Commands
             
             var signer = client.Signer;
             AccountHelper.SaveToFile(account, options.OutputPathRegisteration);
-            SignerHelper.SaveToFile((RSJwsTool)signer, options.OutputPathSigner);
+            SignerHelper.SaveToFile((ESJwsTool)signer, options.OutputPathSigner);
 
             Console.WriteLine("Registration created for {0}.", options.ContactEmailAddress);
             Console.WriteLine("Registration profile saved at {0}.", options.OutputPathRegisteration);
