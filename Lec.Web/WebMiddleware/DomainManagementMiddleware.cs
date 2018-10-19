@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Lec.Acme.DnsProviders;
 using Lec.Web.Models;
 using Lec.Web.Services;
 using Microsoft.AspNetCore.Http;
@@ -33,6 +34,8 @@ namespace Lec.Web.WebMiddleware
             }
 
             var applicant = JsonConvert.DeserializeObject<CertificateApplicant>(requestBody);
+            applicant.DnsProviderConfiguration = KVConfigurationParser.Parse(applicant.DnsProviderConf);
+            
             await _applicantStore.SaveAsync(applicant.Domain, applicant);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
         }

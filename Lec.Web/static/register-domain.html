@@ -5,6 +5,164 @@
     <title>Register Domain</title>
 </head>
 <body>
+
+    <h1>Register a new domain for requesting certificates</h1>
+    <form id="domain-form">
+        <fieldset>
+            <label>
+                Your email address: <input name="ContactEmail" type="email" />
+            </label>
+        </fieldset>
+        
+        <fieldset>
+            <label>
+                Your domain name: <input name="Domain" type="text" />
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <label>
+                Your Dns Provider: 
+                <select name="DnsProvider">
+                    <option selected>Please select</option>
+                    <option value="DnsPod">DnsPod</option>
+                </select>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <label>
+                Dns Provider Configuration Items:
+            </label>
+            <ul rel="dns-conf-list">
+
+            </ul>
+        </fieldset>
+
+        <fieldset>
+            <label>
+                <input type="checkbox" name="AcceptTos" /> Accept term of services at <a href="https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf" target="_blank">Let's Encrypt.</a>
+            </label>
+        </fieldset>
+
+        <button rel="register-domain">Register</button>
+    </form>
     
+    
+    
+    
+    
+    
+<script type="text/template" id="dnsconf-template">
+    <li>
+        <input type="text" name="DnsProviderConf-name-{index}" placeholder="name"/>
+        <input type="text" name="DnsProviderConf-value-{index}" placeholder="value"/>
+        <span rel="remove-item">Remove</span>
+        <span rel="add-item">Add</span>
+    </li>
+</script>
+
+<script>
+    (function(){
+        
+        function addNewItemTo(ul){
+            var newUL = document.createElement('UL');
+            var template = document.getElementById('dnsconf-template').innerText;
+            newUL.innerHTML = template.replace(/\{index\}/g, ul.querySelectorAll('li').length);
+            var li = newUL.querySelector('li');
+            
+            ul.appendChild(li);
+            bindAddRemove(li);
+        }
+        
+        function bindAddRemove(el){
+            el.querySelector('[rel=remove-item]').addEventListener('click', function () {
+                var li = this.parentElement;
+                var ul = li.parentElement;
+                if(ul.querySelectorAll('li').length > 1) {
+                    ul.removeChild(li);
+                }
+            }, false);
+            
+            el.querySelector('[rel=add-item]').addEventListener('click', function () {
+                var li = this.parentElement;
+                var ul = li.parentElement;
+                addNewItemTo(ul);
+            }, false);
+        }
+        
+        function addDomain(callback){
+            var form = document.querySelector('form');
+            var inputs = Array.prototype.slice.apply(form.querySelectorAll('[name]'));
+            
+            var postBody = {};
+            var errors  = [];
+            inputs.filter(function (ipt) { return !ipt.getAttribute('name').startsWith('DnsProviderConf')  })
+                .forEach(function (ipt) {
+                var name = ipt.getAttribute('name');
+                var value = ipt.value;
+                if(!value){
+                    errors.push('Please provide value for ' + name);
+                }
+                
+                postBody[name] = ipt.type === 'checkbox' ? ipt.checked : value;
+            });
+
+
+            inputs.filter(function (ipt) { return ipt.getAttribute('name').startsWith('DnsProviderConf-name')  })
+                .forEach(function (ipt) {
+                var name = ipt.getAttribute('name');
+                var nameValue = ipt.value;
+                if(!nameValue){
+                    errors.push('Please provide nameValue for ' + name);
+                }
+
+                var valName = name.replace('name', 'value');
+                var valValue = document.querySelector('[name=' + valName + ']').value;
+                if(!valValue){
+                    errors.push('Please provide nameValue for ' + valName);
+                }
+                
+                postBody['DnsProviderConf'] = (postBody['DnsProviderConf'] || '') + nameValue + '=' + valValue.replace(/;/g, ';;') + ';';
+            });
+            
+            if(errors.length){
+                callback(errors.join('\n'));
+                return;
+            }
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/domains/', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(postBody));
+            xhr.onreadystatechange =   function (ev) { 
+              if(xhr.readyState === 4){
+               callback(xhr.status !== 200 ? 'Error status ' + xhr.status + ' returned from server.' : null);   
+              }
+            };
+        }
+       
+        
+        addNewItemTo(document.querySelector('[rel=dns-conf-list]'));
+        document.querySelector('button[rel=register-domain]').addEventListener('click', function (ev) {
+            var button = this;
+            button.setAttribute('disabled', 'disabled');
+            
+            addDomain(function (error) {
+                button.removeAttribute('disabled');
+                
+                if(error){
+                    alert(error);
+                }else{
+                    document.querySelector('form').reset();
+                    alert('Domain has been successfully registered.');
+                }
+            });
+            
+            ev.preventDefault();
+            return false;
+        }, false);
+    })();
+</script>
 </body>
 </html>

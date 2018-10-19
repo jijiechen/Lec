@@ -16,6 +16,9 @@ namespace Lec.Web.WebMiddleware
             }
             catch (Exception exception)
             {
+                Console.Error.WriteLine(exception.Message);
+                Console.Error.WriteLine(exception.StackTrace);
+                
                 try
                 {
                     context.Response.Clear();

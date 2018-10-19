@@ -9,6 +9,7 @@ namespace Lec.Web.Models
             
         public string Domain { get; set; }
         public string DnsProvider { get; set; }
+        public string DnsProviderConf { get; set; }
         public Dictionary<string, string> DnsProviderConfiguration { get; set; }
     }
 }
