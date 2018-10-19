@@ -11,7 +11,7 @@ namespace Lec.Web.WebMiddleware
     {
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var staticPrefix = "/static/";
+            const string staticPrefix = "/static/";
             var requestPath = context.Request.Path.ToString().ToLower();
             if (!requestPath.StartsWith(staticPrefix))
             {

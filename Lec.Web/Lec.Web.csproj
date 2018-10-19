@@ -14,4 +14,9 @@
     <ItemGroup>
         <EmbeddedResource Include="static/**/*" CopyToOutputDirectory="false" CopyToPublishDirectory="false"></EmbeddedResource>
     </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\Lec.Acme\Lec.Acme.csproj" />
+    </ItemGroup>
 </Project>
