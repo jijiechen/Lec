@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Lec.Acme.DnsProviders;
 using Lec.Acme.Models;
 using Lec.Acme.Services;
 using Lec.Acme.Utilities;
@@ -52,14 +55,15 @@ namespace Lec.Web.WebMiddleware
                 return;
             }
 
-            context.Response.ContentType = "application/octet-stream";
             var certificate = await _certificateStore.RetrieveAsync(applicant.Domain);
             if (certificate == null || !IsValid(certificate, refreshDays))
             {
                 certificate = await RequestNewCertificateAsync(applicant);
                 await _certificateStore.SaveAsync(applicant.Domain, certificate);
             }
-
+            
+            context.Response.ContentType = "application/octet-stream";
+            context.Response.Headers.Add("Content-Disposition", $"attachment;filename={domain}.pem");
             CertExporter.Export(certificate, CertOutputType.Pem, context.Response.Body);
         }
 
@@ -67,7 +71,9 @@ namespace Lec.Web.WebMiddleware
         {
             await InitLecManagerAccountAsync(applicant);
 
-            var certificate = await _lecManager.RequestCertificateAsync(null, applicant.Domain, alternativeHostnames: null);
+            var dnsProvider = GetDnsProvider(applicant.DnsProvider, applicant.DnsProviderConf);
+            var issuedCertificate = await _lecManager.RequestCertificateAsync(dnsProvider, applicant.Domain, Enumerable.Empty<string>());
+            var certificate = issuedCertificate;
             await _certificateStore.SaveAsync(applicant.Domain, certificate);
             return certificate;
         }
@@ -78,7 +84,7 @@ namespace Lec.Web.WebMiddleware
             if (account == null)
             {
                 await _lecManager.InitializeAsync(account: null);
-                account = await _lecManager.CreateAccountAsync(new[] {applicant.ContactEmail}, applicant.AcceptTos);
+                account = await _lecManager.CreateAccountAsync(new[] { "mailto:" + applicant.ContactEmail}, applicant.AcceptTos);
                 await _accountStore.SaveAsync(applicant.ContactEmail, account);
             }
             
@@ -93,6 +99,22 @@ namespace Lec.Web.WebMiddleware
                 var cert = CertHelper.ImportCertificate(EncodingFormat.PEM, pemStream);
                 return cert.IsValidNow && cert.NotAfter > DateTime.UtcNow.AddDays(refreshDays + 1);
             }
+        }
+
+
+        private static Dictionary<string, Type> _supportedDnsProviderTypes;
+        private static IDnsProvider GetDnsProvider(string dnsProviderName, string dnsProviderConfiguration)
+        {
+            if (_supportedDnsProviderTypes == null)
+            {
+                _supportedDnsProviderTypes = DnsProviderTypeDiscoverer.Discover();
+            }
+
+            var dnsProviderType = _supportedDnsProviderTypes[dnsProviderName];
+            var dnsProvider = Activator.CreateInstance(dnsProviderType) as IDnsProvider;
+            dnsProvider?.Initialize(dnsProviderConfiguration ?? string.Empty);
+
+            return dnsProvider;
         }
     }
 }

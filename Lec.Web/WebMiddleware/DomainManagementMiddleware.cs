@@ -34,8 +34,6 @@ namespace Lec.Web.WebMiddleware
             }
 
             var applicant = JsonConvert.DeserializeObject<CertificateApplicant>(requestBody);
-            applicant.DnsProviderConfiguration = KVConfigurationParser.Parse(applicant.DnsProviderConf);
-            
             await _applicantStore.SaveAsync(applicant.Domain, applicant);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
         }

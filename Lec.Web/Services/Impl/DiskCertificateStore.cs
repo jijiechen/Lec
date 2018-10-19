@@ -19,6 +19,7 @@ namespace Lec.Web.Services.Impl
             using (var ms = new MemoryStream(bytes))
             {
                 CertHelper.ImportCertificate(EncodingFormat.PEM, ms);
+                // todo: buggy
                 var pos = ms.Position;
                
                 return new IssuedCertificate
