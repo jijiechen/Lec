@@ -108,11 +108,11 @@ namespace Lec.DnsProviders.BuiltinProviders
             }
             catch (HttpRequestException httpException)
             {
-                throw new DnsPodResponseException(RecordCreateAPI, httpException, responseContent, (response == null ? HttpStatusCode.SwitchingProtocols : response.StatusCode));
+                throw new DnsPodResponseException(uri.AbsolutePath, httpException, responseContent, (response == null ? HttpStatusCode.SwitchingProtocols : response.StatusCode));
             }
             catch (JsonException jsonException)
             {
-                throw new DnsPodResponseException(RecordCreateAPI, jsonException, responseContent, response.StatusCode);
+                throw new DnsPodResponseException(uri.AbsolutePath, jsonException, responseContent, response.StatusCode);
             }
         }
 
@@ -141,7 +141,7 @@ namespace Lec.DnsProviders.BuiltinProviders
 
         public void Dispose()
         {
-
+            _httpClient.Dispose();
         }
     }
 
@@ -177,8 +177,6 @@ namespace Lec.DnsProviders.BuiltinProviders
     class DnsPodResponseObject
     {
         public DnsPodResponseStatus Status { get; set; }
-
-
 
         public class DnsPodResponseStatus
         {

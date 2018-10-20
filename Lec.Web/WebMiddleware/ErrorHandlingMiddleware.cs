@@ -23,7 +23,7 @@ namespace Lec.Web.WebMiddleware
                 {
                     context.Response.Clear();
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    await context.Response.WriteAsync("An server occured.");
+                    await context.Response.WriteAsync("A server error occured.");
                 }catch{}
             }
         }
