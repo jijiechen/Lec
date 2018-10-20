@@ -55,6 +55,7 @@ namespace Lec.Web.WebMiddleware
                 return;
             }
 
+            // todo: if a request is in progress, prevent later requests of same domain.
             var certificate = await _certificateStore.RetrieveAsync(applicant.Domain);
             if (certificate == null || !IsValid(certificate, refreshDays))
             {
@@ -72,10 +73,7 @@ namespace Lec.Web.WebMiddleware
             await InitLecManagerAccountAsync(applicant);
 
             var dnsProvider = GetDnsProvider(applicant.DnsProvider, applicant.DnsProviderConf);
-            var issuedCertificate = await _lecManager.RequestCertificateAsync(dnsProvider, applicant.Domain, Enumerable.Empty<string>());
-            var certificate = issuedCertificate;
-            await _certificateStore.SaveAsync(applicant.Domain, certificate);
-            return certificate;
+            return await _lecManager.RequestCertificateAsync(dnsProvider, applicant.Domain, Enumerable.Empty<string>());
         }
 
         private async Task InitLecManagerAccountAsync(CertificateApplicant applicant)
@@ -88,7 +86,6 @@ namespace Lec.Web.WebMiddleware
                 await _accountStore.SaveAsync(applicant.ContactEmail, account);
             }
             
-            // BUG: can _lecManager be initialized twice when an account is just created above?
             await _lecManager.InitializeAsync(account);
         }
 

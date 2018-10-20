@@ -19,9 +19,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Lec.Acme\Lec.Acme.csproj" />
     </ItemGroup>
-
-
-    <ItemGroup>
-      <Folder Include="lec-data" />
-    </ItemGroup>
 </Project>

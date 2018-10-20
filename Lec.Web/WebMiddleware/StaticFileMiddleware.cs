@@ -11,6 +11,13 @@ namespace Lec.Web.WebMiddleware
     {
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
+            // /static/register-domain.html is the default page 
+            if (context.Request.Path.ToString() == "/")
+            {
+                context.Response.Redirect("/static/register-domain.html");
+                return;
+            }
+            
             const string staticPrefix = "/static/";
             var requestPath = context.Request.Path.ToString().ToLower();
             if (!requestPath.StartsWith(staticPrefix))

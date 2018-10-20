@@ -61,7 +61,7 @@ namespace Lec.Commands
             var account = await _lecManager.CreateAccountAsync(contacts, true);
             
             AccountPersistence.SaveToFile(account.Account, options.OutputPathRegisteration);
-            SignerHelper.SaveToFile((ESJwsTool)account.Signer, options.OutputPathSigner);
+            SignerHelper.SaveToFile(account.Signer, options.OutputPathSigner);
 
             Console.WriteLine("Registration created for {0}.", options.ContactEmailAddress);
             Console.WriteLine("Registration profile saved at {0}.", options.OutputPathRegisteration);

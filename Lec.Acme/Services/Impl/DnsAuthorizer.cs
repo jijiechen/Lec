@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ACMESharp.Authorizations;
 using ACMESharp.Protocol;
@@ -36,24 +37,18 @@ namespace Lec.Acme.Services.Impl
         static async Task AcceptDnsChallengeAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)
         {
             var dnsRecord = await ApplyDnsRecordAsync(challenge, auth, client, dnsProvider);
+            
+            await Task.Delay(TimeSpan.FromSeconds(5)); // wait for 5 second explicitly
             await client.AnswerChallengeAsync(challenge.Url);
 
             await AutoRetry.Start(async () => await client.GetChallengeDetailsAsync(challenge.Url),
-                latest => "valid" == latest.Status,
+                latest => "pending" != latest.Status /* stop on 'valid' and 'invalid' */,
                 millisecondsInterval: 4 * 1000,
                 maxTry: 30);
 
-            try
-            {
-                await RemoveRecordFromDnsAsync(dnsProvider, dnsRecord);
-            }
-            catch
-            {
-#if DEBUG
-                throw;
-#endif
-                /* ignore this error in release mode */
-            }
+            var _ = RemoveRecordFromDnsAsync(dnsProvider, dnsRecord)
+                .ContinueWith(t => {/* ignore result or errors */ })
+                .ConfigureAwait(false);
         }
 
         private static async Task<string> ApplyDnsRecordAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using ACMESharp.Crypto.JOSE;
 using ACMESharp.Crypto.JOSE.Impl;
@@ -13,13 +14,18 @@ namespace Lec.Persistence
             signerPath = PathUtils.NormalizedPath(signerPath);
             var json = File.ReadAllText(signerPath);
             var signerObj = JsonConvert.DeserializeObject<ExportedSigner>(json);
-            return GenerateTool($"ES{signerObj.HashSize}", json);
+            return GenerateTool(signerObj.JwsAlg, json);
         }
 
 
-        public static void SaveToFile(ESJwsTool signer, string signerPath)
+        public static void SaveToFile(IJwsTool signer, string signerPath)
         {
             var json = signer.Export();
+            
+            var dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            dic.Add("JwsAlg", signer.JwsAlg);
+            json = JsonConvert.SerializeObject(dic);
+            
             File.WriteAllText(signerPath, json);
         }
         
@@ -49,7 +55,7 @@ namespace Lec.Persistence
 
         class ExportedSigner
         {
-            public int HashSize { get; set; }
+            public string JwsAlg { get; set; }
         }
     }
 }

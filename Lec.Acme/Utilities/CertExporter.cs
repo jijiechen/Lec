@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text;
 using Lec.Acme.Models;
 
 namespace Lec.Acme.Utilities
@@ -31,13 +33,15 @@ namespace Lec.Acme.Utilities
 
         static void ExportPem(IssuedCertificate certificate, Stream outputStream)
         {
-            using (var crtStream = new MemoryStream(certificate.PemPublicKey))
-            {
-                var key = ToKey(certificate.PemPrivateKey);
+            var lineBreakBytes = Encoding.ASCII.GetBytes("\n");
+            var totalLength = certificate.PemPublicKey.Length + lineBreakBytes.Length + certificate.PemPrivateKey.Length;
+            var combinedBytes = new byte[totalLength];
+            
+            Buffer.BlockCopy(certificate.PemPublicKey, 0, combinedBytes, 0, certificate.PemPublicKey.Length);
+            Buffer.BlockCopy(lineBreakBytes, 0, combinedBytes, certificate.PemPublicKey.Length, lineBreakBytes.Length);
+            Buffer.BlockCopy(certificate.PemPrivateKey, 0, combinedBytes, certificate.PemPublicKey.Length + lineBreakBytes.Length, certificate.PemPrivateKey.Length);
 
-                crtStream.CopyTo(outputStream);
-                CertHelper.ExportPrivateKey(key, EncodingFormat.PEM, outputStream);
-            }
+            outputStream.Write(combinedBytes, 0, totalLength);
         }
               
         static CertPrivateKey ToKey(byte[] privateKey)

@@ -12,7 +12,7 @@ namespace Lec.Web.Services.Impl
             _storeConfig = storeConfig.Value;
         }
         
-        protected override string ComposeStorageFileName(string domain)
+        protected override string ComposeStorageFilePath(string domain)
         {
             return Path.Combine(_storeConfig.StorageBaseDirectory, domain + ".json");
         }
