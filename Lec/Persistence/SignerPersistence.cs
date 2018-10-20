@@ -4,9 +4,7 @@ using ACMESharp.Crypto.JOSE;
 using ACMESharp.Crypto.JOSE.Impl;
 using Newtonsoft.Json;
 
-// todo: cleanup namespaces and naming
-
-namespace Lec.CertManager
+namespace Lec.Persistence
 {
     class SignerHelper
     {

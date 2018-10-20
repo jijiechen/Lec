@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ACMESharp.Protocol;
 using Lec.Acme.Models;
+using Lec.Acme.Utilities;
 
 namespace Lec.Acme.Services.Impl
 {
@@ -16,48 +15,11 @@ namespace Lec.Acme.Services.Impl
 
         private static async Task<IssuedCertificate> TryRequestCertificate(CertificateRequest csr, AcmeProtocolClient client, string orderUrl)
         {
-            int maxTry = 20;
-            int trySleep = 3 * 1000;
-            var valid = false;
-
-            OrderDetails updatedOrder = null;
-
-            for (var tryCount = 0; tryCount < maxTry; ++tryCount)
-            {
-                if (tryCount > 0)
-                {
-                    // Wait just a bit for
-                    // subsequent queries
-                    Thread.Sleep(trySleep);
-                }
-                
-                updatedOrder = await client.GetOrderDetailsAsync(orderUrl);
-
-                if (!valid)
-                {
-                    // The Order is either Valid, still Pending or some other UNEXPECTED state
-
-                    if ("valid" == updatedOrder.Payload.Status)
-                    {
-                        valid = true;
-                    }
-                    else if ("pending" != updatedOrder.Payload.Status)
-                    {
-                        throw new InvalidOperationException("Unexpected status for Order: " + updatedOrder.Payload.Status);
-                    }
-                }
-
-                if (valid)
-                {
-                    // Once it's valid, then we need to wait for the Cert
-
-                    if (!string.IsNullOrEmpty(updatedOrder.Payload.Certificate))
-                    {
-                        break;
-                    }
-                }
-            }
-            
+            var updatedOrder = await AutoRetry.Start(
+                async () => await client.GetOrderDetailsAsync(orderUrl),
+                order => "valid" == order.Payload.Status &&  !string.IsNullOrEmpty(order.Payload.Certificate),
+                3 * 1000,
+                30);
 
             var certBytes = await client.GetOrderCertificateAsync(updatedOrder);
             return new IssuedCertificate

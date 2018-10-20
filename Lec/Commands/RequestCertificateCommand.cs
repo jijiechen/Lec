@@ -1,5 +1,4 @@
-﻿using Lec.CertManager;
-using Microsoft.Extensions.CommandLineUtils;
+﻿using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +10,7 @@ using Lec.Acme.DnsProviders;
 using Lec.Acme.Models;
 using Lec.Acme.Services;
 using Lec.Acme.Utilities;
+using Lec.Persistence;
 using static Lec.ConsoleUtils;
 using static Lec.PathUtils;
 

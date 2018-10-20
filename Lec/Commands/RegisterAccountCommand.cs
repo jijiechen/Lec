@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using ACMESharp.Crypto.JOSE.Impl;
 using Lec.Acme.Services;
-using Lec.CertManager;
+using Lec.Persistence;
 using static Lec.ConsoleUtils;
 using static Lec.PathUtils;
 

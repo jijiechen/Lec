@@ -16,7 +16,7 @@ namespace Lec.Acme.Services.Impl
         private readonly ICertificateCollector _certificateCollector;
         private readonly ICsrGenerator _csrGenerator;
 
-        private bool _isInited;
+        private bool _hasInited;
         private LecAcmeConfiguration _config;
         private AcmeProtocolClient _acmeClient;
 
@@ -37,13 +37,12 @@ namespace Lec.Acme.Services.Impl
         public async Task InitializeAsync(AcmeAccount account)
         {
             _acmeClient = await _clientFactory.CreateAcmeClientAsync(_config, account?.Account, account?.Signer);
-            
-            _isInited = true;
+            _hasInited = true;
         }
 
         public async Task<AcmeAccount> CreateAccountAsync(IEnumerable<string> contacts, bool acceptTos)
         {
-            if (!_isInited)
+            if (!_hasInited)
             {
                 throw new InvalidOperationException("Should initialize this AcmeManager instance before using it.");
             }
@@ -60,7 +59,7 @@ namespace Lec.Acme.Services.Impl
 
         public async Task<IssuedCertificate> RequestCertificateAsync(IDnsProvider dnsProvider, string hostname, IEnumerable<string> alternativeHostnames)
         {
-            if (!_isInited)
+            if (!_hasInited)
             {
                 throw new InvalidOperationException("Should initialize this AcmeManager instance before using it.");
             }
@@ -69,7 +68,6 @@ namespace Lec.Acme.Services.Impl
             var alternatives = alternativeHostnames.ToArray();
             var order = await _acmeClient.CreateOrderAsync(new[] {hostname}.Concat( alternatives ));
             await _dnsAuthorizer.AuthorizeAsync(_acmeClient, order, dnsProvider);
-
 
             var csr = await _csrGenerator.GenerateCsrAsync(_config.PrivateKeyBitLength, hostname, alternatives);
             return await _certificateCollector.CollectCertificateAsync(_acmeClient, order, csr);

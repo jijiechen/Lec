@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ACMESharp.Protocol;
 
-namespace Lec
+namespace Lec.Persistence
 {
     class AccountPersistence
     {

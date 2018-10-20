@@ -33,14 +33,11 @@ namespace Lec.Acme.Utilities
         {
             using (var crtStream = new MemoryStream(certificate.PemPublicKey))
             {
-                var cert = CertHelper.ImportCertificate(EncodingFormat.PEM, crtStream);
                 var key = ToKey(certificate.PemPrivateKey);
 
-                CertHelper.ExportCertificate(cert, EncodingFormat.PEM, outputStream);
+                crtStream.CopyTo(outputStream);
                 CertHelper.ExportPrivateKey(key, EncodingFormat.PEM, outputStream);
             }
-            
-            // todo: Copy received certificate directly as public key
         }
               
         static CertPrivateKey ToKey(byte[] privateKey)

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using ACMESharp.Authorizations;
 using ACMESharp.Protocol;
@@ -37,51 +35,37 @@ namespace Lec.Acme.Services.Impl
 
         static async Task AcceptDnsChallengeAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)
         {
-            await ApplyDnsRecordAsync(challenge, auth, client, dnsProvider);
+            var dnsRecord = await ApplyDnsRecordAsync(challenge, auth, client, dnsProvider);
             await client.AnswerChallengeAsync(challenge.Url);
 
-            var maxTry = 30;
-            var trySleep = 3 * 1000;
-            
-            for (var tryCount = 0; tryCount < maxTry; ++tryCount)
-            {
-                if (tryCount > 0)
-                {
-                    Thread.Sleep(trySleep);
-                }
-               
-                var latest = await client.GetChallengeDetailsAsync(challenge.Url);
-                if ("valid" == latest.Status)
-                {
-                    break;
-                }
+            await AutoRetry.Start(async () => await client.GetChallengeDetailsAsync(challenge.Url),
+                latest => "valid" == latest.Status,
+                millisecondsInterval: 4 * 1000,
+                maxTry: 30);
 
-                if ("pending" != latest.Status)
-                {
-                    throw new InvalidOperationException("Unexpected status for answered Challenge: " + latest.Status);
-                }
+            try
+            {
+                await RemoveRecordFromDnsAsync(dnsProvider, dnsRecord);
             }
-            
-            // todo: Extract a common auto retry
+            catch
+            {
+#if DEBUG
+                throw;
+#endif
+                /* ignore this error in release mode */
+            }
         }
 
-        private static async Task ApplyDnsRecordAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)
+        private static async Task<string> ApplyDnsRecordAsync(Challenge challenge, Authorization auth, AcmeProtocolClient client, IDnsProvider dnsProvider)
         {
             var dnsChallenge = AuthorizationDecoder.ResolveChallengeForDns01(auth, challenge, client.Signer);
             var txtRecord = await AddRecordToDnsAsync(dnsProvider, dnsChallenge);
 
-            while (true)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                var record = await DnsUtil.LookupRecordAsync("TXT", dnsChallenge.DnsRecordName);
-                if (record != null)
-                {
-                    break;
-                }
-            }
-            
-            // todo: 1. Remove record after auth
-            // todo: 2. Break the above while(true) to prevent infinite loops
+            await AutoRetry.Start(
+                async () => await DnsUtil.LookupRecordAsync("TXT", dnsChallenge.DnsRecordName),
+                records => records != null && records.Any());
+
+            return txtRecord;
         }
 
         static async Task<string> AddRecordToDnsAsync(IDnsProvider dnsProvider, Dns01ChallengeValidationDetails dnsChallenge)
@@ -89,6 +73,11 @@ namespace Lec.Acme.Services.Impl
             return await Task.Factory.StartNew(() => 
                 dnsProvider.AddTxtRecord(dnsChallenge.DnsRecordName, 
                                         dnsChallenge.DnsRecordValue));
+        }
+        
+        static async Task RemoveRecordFromDnsAsync(IDnsProvider dnsProvider, string dnsRecordRef)
+        {
+            await Task.Factory.StartNew(() => dnsProvider.RemoveTxtRecord(dnsRecordRef));
         }
 
     }
