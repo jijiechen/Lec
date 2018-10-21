@@ -3,6 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp2.1</TargetFramework>
+        <LecExcludes>lec-data\**</LecExcludes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,13 +11,36 @@
       <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.3" />
     </ItemGroup>
 
-
     <ItemGroup>
-        <EmbeddedResource Include="static/**/*" CopyToOutputDirectory="false" CopyToPublishDirectory="false"></EmbeddedResource>
+        <None Remove="$(LecExcludes)" />
+        <Compile Remove="$(LecExcludes)" />
+        <EmbeddedResource Remove="$(LecExcludes)" />
+        <Content Remove="$(LecExcludes)" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="static/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+        <None Include="Dockerfile" CopyToOutputDirectory="Never" CopyToPublishDirectory="Always" />
     </ItemGroup>
 
 
     <ItemGroup>
       <ProjectReference Include="..\Lec.Acme\Lec.Acme.csproj" />
     </ItemGroup>
+
+    <Target Name="BuildDnsProviders" BeforeTargets="Build">
+        <Exec Command="dotnet build ../Lec.DnsProviders.BuiltinProviders/Lec.DnsProviders.BuiltinProviders.csproj -c $(Configuration) -o ../Lec.Web/$(OutputPath)" />
+    </Target>
+    <Target Name="PublishDnsProviders" BeforeTargets="PublishBuild">
+        <Exec Command="dotnet publish ../Lec.DnsProviders.BuiltinProviders/Lec.DnsProviders.BuiltinProviders.csproj -c $(Configuration) -o ../Lec.Web/$(PublishDir)" />
+    </Target>
+    
+    <Target Name="BuildDockerImage" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+        <PropertyGroup>
+            <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMddHHmm))</CurrentDate>
+        </PropertyGroup>
+        
+        <Exec Command="docker build -f $(PublishDir)/Dockerfile -t jijiechen/lecweb:$(CurrentDate) $(PublishDir)" />
+    </Target>
+    
 </Project>

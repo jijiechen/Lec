@@ -14,4 +14,11 @@
     <ProjectReference Include="..\Lec.Acme\Lec.Acme.csproj" />
   </ItemGroup>
 
+
+  <Target Name="BuildDnsProviders" AfterTargets="Build">
+    <Exec Command="dotnet build ../Lec.DnsProviders.BuiltinProviders/Lec.DnsProviders.BuiltinProviders.csproj -c $(Configuration) -o ../Lec/$(OutputPath)" />
+  </Target>
+  <Target Name="PublishDnsProviders" AfterTargets="Publish">
+    <Exec Command="dotnet publish ../Lec.DnsProviders.BuiltinProviders/Lec.DnsProviders.BuiltinProviders.csproj -c $(Configuration) -o ../Lec/$(PublishDir)" />
+  </Target>
 </Project>

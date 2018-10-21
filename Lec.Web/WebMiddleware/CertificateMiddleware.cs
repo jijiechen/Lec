@@ -65,7 +65,6 @@ namespace Lec.Web.WebMiddleware
                 var shouldNotStore = !string.IsNullOrEmpty(store) 
                     && bool.TryParse(store, out var canStore) 
                     && !canStore; 
-                
                 if (!shouldNotStore)
                 {
                     await _certificateStore.SaveAsync(applicant.Domain, certificate);
