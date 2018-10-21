@@ -44,7 +44,7 @@ namespace Lec.Acme.Services.Impl
             await AutoRetry.Start(async () => await client.GetChallengeDetailsAsync(challenge.Url),
                 latest => "pending" != latest.Status /* stop on 'valid' and 'invalid' */,
                 millisecondsInterval: 4 * 1000,
-                maxTry: 30);
+                maxTries: 30);
 
             var _ = RemoveRecordFromDnsAsync(dnsProvider, dnsRecord)
                 .ContinueWith(t => {/* ignore result or errors */ })

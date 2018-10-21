@@ -5,13 +5,13 @@ namespace Lec.Acme.Utilities
 {
     public class AutoRetry
     {
-        public static async Task<T> Start<T>(Func<Task<T>> tryIt, Func<T, bool> hasSuccessed, int millisecondsInterval = 3000, int maxTry = 10)
+        public static async Task<T> Start<T>(Func<Task<T>> tryIt, Func<T, bool> shouldStopIf, int millisecondsInterval = 3000, int maxTries = 10)
         {
             var counter = 0;
-            while (++counter <= maxTry)
+            while (++counter <= maxTries)
             {
                 var result = await tryIt();
-                if (hasSuccessed(result))
+                if (shouldStopIf(result))
                 {
                     return result;
                 }

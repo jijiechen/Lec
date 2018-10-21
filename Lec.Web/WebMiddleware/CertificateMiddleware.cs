@@ -43,6 +43,8 @@ namespace Lec.Web.WebMiddleware
 
             var domain = match.Groups["domain"].Value;
             var refresh = context.Request.Query["refresh_days"];
+            var store = context.Request.Query["store"];
+            var format = context.Request.Query["format"];
             if (string.IsNullOrWhiteSpace(refresh) || !int.TryParse(refresh, out var refreshDays))
             {
                 refreshDays = 60;
@@ -60,12 +62,23 @@ namespace Lec.Web.WebMiddleware
             if (certificate == null || !IsValid(certificate, refreshDays))
             {
                 certificate = await RequestNewCertificateAsync(applicant);
-                await _certificateStore.SaveAsync(applicant.Domain, certificate);
+                var shouldNotStore = !string.IsNullOrEmpty(store) 
+                    && bool.TryParse(store, out var canStore) 
+                    && !canStore; 
+                
+                if (!shouldNotStore)
+                {
+                    await _certificateStore.SaveAsync(applicant.Domain, certificate);
+                }
             }
             
             context.Response.ContentType = "application/octet-stream";
             context.Response.Headers.Add("Content-Disposition", $"attachment;filename={domain}.pem");
-            CertExporter.Export(certificate, CertOutputType.Pem, context.Response.Body);
+            
+            var exportPfx = !string.IsNullOrEmpty(format) && "pfx" == ((string) format).ToLower();
+            CertExporter.Export(certificate, 
+                exportPfx ? CertOutputType.Pfx : CertOutputType.Pem, 
+                context.Response.Body);
         }
 
         private async Task<IssuedCertificate> RequestNewCertificateAsync(CertificateApplicant applicant)

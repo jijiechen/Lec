@@ -6,7 +6,7 @@
 </head>
 <body>
 
-    <h1>Register a new domain for requesting certificates</h1>
+    <h1>Register a new domain to request certificates</h1>
     <form id="domain-form">
         <fieldset>
             <label>
@@ -24,10 +24,7 @@
             <label>
                 Your Dns Provider: 
                 <select name="DnsProvider">
-                    <option selected>Please select</option>
-                    <option value="Azure">Azure</option>
-                    <option value="Aliyun">Aliyun</option>
-                    <option value="DnsPod">DnsPod</option>
+                    <option selected value="">Please select</option>
                 </select>
             </label>
         </fieldset>
@@ -39,6 +36,9 @@
             <ul rel="dns-conf-list">
 
             </ul>
+            <p>
+                <a href="javascript:void(0)" style="display:none;" rel="dns-helplink" target="_blank" title="Click to see how to get these configuration information.">What are these?</a>
+            </p>
         </fieldset>
 
         <fieldset>
@@ -143,9 +143,64 @@
               }
             };
         }
-       
-        
-        addNewItemTo(document.querySelector('[rel=dns-conf-list]'));
+     
+        function initDnsProviders(){
+            var dnsConfigTable = {
+              DnsPod : {requiredItems: ["token_id", "token", "domain"], helpLink: 'https://www.dnspod.cn/docs/info.html#common-parameters' },
+              Azure:  {requiredItems:["subscription_id","tenant_id","client_id","client_key","resource_group","zone_name"], helpLink: 'https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-v1-add-azure-ad-app' },
+              Aliyun:  {requiredItems:["access_key_id", "access_key_secret", "domain"], helpLink: 'https://help.aliyun.com/document_detail/66453.html' }  
+            };
+            
+            
+            var dropdown = document.querySelector('select[name=DnsProvider]');
+            Object.keys(dnsConfigTable).forEach(function (dns) {
+                var option = document.createElement('OPTION');
+                option.innerHTML = dns;
+                option.setAttribute('value', dns);
+                dropdown.appendChild(option);
+            });
+            
+            dropdown.addEventListener('change', function (evt) { 
+                var selected = this.value;
+
+                cleanupOptions(this);
+                if(selected){
+                    switchToDnsOptions(this);
+                }
+            }, false);
+            
+            
+            function cleanupOptions(selectElement){
+                var confList = document.querySelector('[rel=dns-conf-list]');
+                while(confList.firstChild){
+                    confList.removeChild(confList.firstChild);
+                }
+                var helpLink = document.querySelector('a[rel=dns-helplink]');
+                helpLink.setAttribute('href', 'javascript:void(0)');
+                helpLink.style.display = 'none';
+            }
+            
+            function switchToDnsOptions(selectElement) {
+                var confList = document.querySelector('[rel=dns-conf-list]');
+                var dns = selectElement.value;
+                var conf = dnsConfigTable[dns];
+                if(!conf){
+                    return;
+                }
+                
+                conf.requiredItems.forEach(function (c) {
+                    addNewItemTo(confList);
+                    var liItemsCount = confList.querySelectorAll('li').length;
+                    var inputName = 'input[name=DnsProviderConf-name-' + (liItemsCount-1) + ']';
+                    confList.querySelector(inputName).value = c;
+                });
+                var helpLink = document.querySelector('a[rel=dns-helplink]');
+                helpLink.setAttribute('href', conf.helpLink);
+                helpLink.style.display = 'inline';
+            }
+        }
+
+        initDnsProviders();
         document.querySelector('button[rel=register-domain]').addEventListener('click', function (ev) {
             var button = this;
             button.setAttribute('disabled', 'disabled');
@@ -157,7 +212,9 @@
                     alert(error);
                 }else{
                     document.querySelector('form').reset();
-                    alert('Domain has been successfully registered.');
+                    alert('Domain has been successfully registered.\n' + 
+                    'You can now use following API to request new certificates:\n' + 
+                    '/api/certificate/{domain}?refresh_days={days}&format={pem|pfx}&store={true|false}');
                 }
             });
             
