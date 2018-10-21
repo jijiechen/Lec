@@ -31,7 +31,7 @@
     <Target Name="BuildDnsProviders" BeforeTargets="Build">
         <Exec Command="dotnet build ../Lec.DnsProviders.BuiltinProviders/Lec.DnsProviders.BuiltinProviders.csproj -c $(Configuration) -o ../Lec.Web/$(OutputPath)" />
     </Target>
-    <Target Name="PublishDnsProviders" BeforeTargets="PublishBuild">
+    <Target Name="PublishDnsProviders" BeforeTargets="_CopyResolvedFilesToPublishAlways">
         <Exec Command="dotnet publish ../Lec.DnsProviders.BuiltinProviders/Lec.DnsProviders.BuiltinProviders.csproj -c $(Configuration) -o ../Lec.Web/$(PublishDir)" />
     </Target>
     
