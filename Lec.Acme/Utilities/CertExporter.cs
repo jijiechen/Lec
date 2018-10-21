@@ -7,12 +7,12 @@ namespace Lec.Acme.Utilities
 {
     public class CertExporter
     {
-        public static void Export(IssuedCertificate certificate, CertOutputType outType, Stream outputStream)
+        public static void Export(IssuedCertificate certificate, Stream outputStream, CertOutputType outType, string pfxPassword = null)
         {
             switch (outType)
             {
                 case CertOutputType.Pfx:
-                    ExportPfx(certificate, outputStream);
+                    ExportPfx(certificate, outputStream, pfxPassword);
                     break;
                 case CertOutputType.Pem:
                     ExportPem(certificate, outputStream);
@@ -20,14 +20,14 @@ namespace Lec.Acme.Utilities
             }
         }
 
-        static void ExportPfx(IssuedCertificate certificate, Stream outputStream)
+        static void ExportPfx(IssuedCertificate certificate, Stream outputStream, string password)
         {
             using (var crtStream = new MemoryStream(certificate.PemPublicKey))
             {
                 var cert = CertHelper.ImportCertificate(EncodingFormat.PEM, crtStream);
                 var key = ToKey(certificate.PemPrivateKey);
 
-                CertHelper.ExportArchive(key, new[] {cert}, ArchiveFormat.PKCS12, outputStream);
+                CertHelper.ExportArchive(key, new[] {cert}, ArchiveFormat.PKCS12, outputStream, password);
             }
         }
 

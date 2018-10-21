@@ -110,7 +110,7 @@ namespace Lec.Commands
                 options.OutputFile = PrepareOutputFilePath(options.OutputFile, out _);
                 using (var file = File.Create(options.OutputFile))
                 {
-                    CertExporter.Export(issuedCertificate, options.OutputType, file);
+                    CertExporter.Export(issuedCertificate, file, options.OutputType);
                 }
                 Console.WriteLine("Certificate has been exported as {0} format at {1}.", outTypeString, options.OutputFile); 
             }

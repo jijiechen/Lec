@@ -20,7 +20,7 @@ namespace Lec.Web.Services.Impl
         {
             using (var ms = new MemoryStream())
             {
-                CertExporter.Export(entity, CertOutputType.Pem, ms);
+                CertExporter.Export(entity, ms, CertOutputType.Pem);
                 return ms.GetBuffer();
             }
         }
