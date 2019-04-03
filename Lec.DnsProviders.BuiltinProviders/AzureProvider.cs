@@ -60,6 +60,11 @@ namespace Lec.DnsProviders.BuiltinProviders
                 }
             };
 
+            if (name.EndsWith(_dnsZoneName, StringComparison.OrdinalIgnoreCase))
+            {
+                name = name.Substring(0, name.Length - _dnsZoneName.Length - 1);
+            }
+            
             var recordSet = _dnsClient.RecordSets.CreateOrUpdateAsync(
                 _resourceGroupName,
                 _dnsZoneName,
