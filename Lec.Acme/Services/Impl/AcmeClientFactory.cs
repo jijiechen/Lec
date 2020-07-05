@@ -12,7 +12,10 @@ namespace Lec.Acme.Services.Impl
         public async Task<AcmeProtocolClient> CreateAcmeClientAsync(LecAcmeConfiguration configuration, AccountDetails account = null, IJwsTool signer = null)
         {
             var http = CreateHttpClient(configuration);
-            var client = new AcmeProtocolClient(http, null, account, signer);
+            // 根据 Acme 要求，使用 Post-As-Get 功能
+            // https://community.letsencrypt.org/t/acme-v2-scheduled-deprecation-of-unauthenticated-resource-gets/74380
+            var client = new AcmeProtocolClient(http, null, account, signer, 
+                false, null, true);
             
             client.Directory = await client.GetDirectoryAsync();
             await client.GetNonceAsync();
