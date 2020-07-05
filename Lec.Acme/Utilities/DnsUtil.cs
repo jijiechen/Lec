@@ -42,18 +42,27 @@ namespace Lec.Acme.Utilities
         
         public static async Task<IEnumerable<string>> LookupRecordAsync(string type, string name)
         {
-            var dnsType = (DnsClient.QueryType)Enum.Parse(typeof(DnsClient.QueryType), type);
-            var dnsResp = await DnsClient.QueryAsync(name, dnsType);
+            IDnsQueryResponse dnsResp = null;
+            try
+            {
+                var dnsType = (DnsClient.QueryType) Enum.Parse(typeof(DnsClient.QueryType), type);
+                dnsResp = await DnsClient.QueryAsync(name, dnsType);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("DNS lookup unexpected error:  " + ex.ToString());
+                return null;
+            }
 
-            if (dnsResp.HasError)
+            if (dnsResp != null && dnsResp.HasError)
             {
                 if ("Non-Existent Domain".Equals(dnsResp.ErrorMessage,StringComparison.OrdinalIgnoreCase))
                     return null;
                 
-                throw new Exception("DNS lookup error:  " + dnsResp.ErrorMessage);
+                throw new Exception("DNS lookup failed:  " + dnsResp.ErrorMessage);
             }
 
-            return dnsResp.AllRecords.SelectMany(x => x.ValueAsStrings());
+            return dnsResp == null ? new string[0] : dnsResp.AllRecords.SelectMany(x => x.ValueAsStrings());
         }
 
         public static IEnumerable<string> ValueAsStrings(this DnsResourceRecord drr)
