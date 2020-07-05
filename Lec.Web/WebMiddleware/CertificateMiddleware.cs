@@ -73,10 +73,12 @@ namespace Lec.Web.WebMiddleware
                 }
             }
             
-            context.Response.ContentType = "application/octet-stream";
-            context.Response.Headers.Add("Content-Disposition", $"attachment;filename={domain}.pem");
-            
             var exportPfx = !string.IsNullOrEmpty(pfx) && !string.IsNullOrEmpty(pfxPassword);
+            var extension = exportPfx ? "pfx" : "pem";
+            
+            context.Response.ContentType = "application/octet-stream";
+            context.Response.Headers.Add("Content-Disposition", $"attachment;filename={domain}.{extension}");
+            
             CertExporter.Export(certificate, 
                 context.Response.Body, 
                 exportPfx ? CertOutputType.Pfx : CertOutputType.Pem,
